@@ -38,11 +38,13 @@
   [[self view] addSubview:playerView];
   
   NSURL *URL = [NSURL URLWithString:@"http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"];
+
   [playerView setVideoURL:URL];
   [playerView prepareAndPlayAutomatically:YES];
   
   [addPlayerButton setEnabled:NO];
   [removePlayerButton setEnabled:YES];
+  [playerView toggleFullscreen];
 }
 
 - (IBAction)removePlayer:(UIButton *)sender {
