@@ -38,6 +38,8 @@
 - (void)pause;
 - (void)stop;
 - (void)toggleFullscreen;
+- (void)hideFullScreenButton;
+- (void)showFullScreenButton;
 
 - (BOOL)isPlaying;
 

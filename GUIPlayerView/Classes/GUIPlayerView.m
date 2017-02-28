@@ -446,6 +446,14 @@
   }];
 }
 
+- (void)hideFullScreenButton {
+    [fullscreenButton setAlpha:0.0f];
+}
+
+- (void)showFullScreenButton {
+    [fullscreenButton setAlpha:1.0f];
+}
+
 #pragma mark - Public Methods
 
 - (void)prepareAndPlayAutomatically:(BOOL)playAutomatically {
