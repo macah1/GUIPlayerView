@@ -24,6 +24,7 @@
 @property (strong, nonatomic) UILabel *airPlayLabel;
 
 @property (strong, nonatomic) UIButton *playButton;
+@property (strong, nonatomic) UIButton *stopButton;
 @property (strong, nonatomic) UIButton *fullscreenButton;
 @property (strong, nonatomic) MPVolumeView *volumeView;
 @property (strong, nonatomic) GUISlider *progressIndicator;
@@ -46,7 +47,7 @@
 
 @synthesize player, playerLayer, currentItem;
 @synthesize controllersView, airPlayLabel;
-@synthesize playButton, fullscreenButton, volumeView, progressIndicator, currentTimeLabel, remainingTimeLabel, liveLabel, spacerView;
+@synthesize playButton, stopButton, fullscreenButton, volumeView, progressIndicator, currentTimeLabel, remainingTimeLabel, liveLabel, spacerView;
 @synthesize activityIndicator, progressTimer, controllersTimer, seeking, fullscreen, defaultFrame;
 
 @synthesize videoURL, controllersTimeoutPeriod, delegate;
@@ -139,7 +140,12 @@
   [playButton setTranslatesAutoresizingMaskIntoConstraints:NO];
   [playButton setImage:[UIImage imageNamed:@"gui_play"] forState:UIControlStateNormal];
   [playButton setImage:[UIImage imageNamed:@"gui_pause"] forState:UIControlStateSelected];
-  
+
+  stopButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [stopButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+  [stopButton setImage:[UIImage imageNamed:@"gui_stop"] forState:UIControlStateNormal];
+
+    
   volumeView = [MPVolumeView new];
   [volumeView setTranslatesAutoresizingMaskIntoConstraints:NO];
   [volumeView setShowsRouteButton:YES];
@@ -179,6 +185,7 @@
   [spacerView setTranslatesAutoresizingMaskIntoConstraints:NO];
   
   [controllersView addSubview:playButton];
+  [controllersView addSubview:stopButton];
   [controllersView addSubview:fullscreenButton];
   [controllersView addSubview:volumeView];
   [controllersView addSubview:currentTimeLabel];
@@ -188,10 +195,11 @@
   [controllersView addSubview:spacerView];
   
   horizontalConstraints = [NSLayoutConstraint
-                           constraintsWithVisualFormat:@"H:|[P(40)][S(10)][C]-5-[I]-5-[R][F(40)][V(40)]|"
+                           constraintsWithVisualFormat:@"H:|[P(40)][T(40)][S(10)][C]-5-[I]-5-[R][F(40)][V(40)]|"
                            options:0
                            metrics:nil
                            views:@{@"P" : playButton,
+                                   @"T" : stopButton,
                                    @"S" : spacerView,
                                    @"C" : currentTimeLabel,
                                    @"I" : progressIndicator,
@@ -236,6 +244,7 @@
   /** Actions Setup ***************************************************************************************************/
   
   [playButton addTarget:self action:@selector(togglePlay:) forControlEvents:UIControlEventTouchUpInside];
+  [stopButton addTarget:self action:@selector(tapStop:) forControlEvents:UIControlEventTouchUpInside];
   [fullscreenButton addTarget:self action:@selector(toggleFullscreen:) forControlEvents:UIControlEventTouchUpInside];
   
   [progressIndicator addTarget:self action:@selector(seek:) forControlEvents:UIControlEventValueChanged];
@@ -289,6 +298,19 @@
   }
   
   [self showControllers];
+}
+
+- (void)tapStop:(UIButton *)button {
+    if([button isSelected]) {
+        [button setSelected:NO];
+    }
+    else {
+        [self stop];
+        
+        if ([delegate respondsToSelector:@selector(playerStopped)]) {
+            [delegate playerStopped];
+        }
+    }
 }
 
 - (void)toggleFullscreen:(UIButton *)button {
@@ -446,13 +468,6 @@
   }];
 }
 
-- (void)hideFullScreenButton {
-    [fullscreenButton setAlpha:0.0f];
-}
-
-- (void)showFullScreenButton {
-    [fullscreenButton setAlpha:1.0f];
-}
 
 #pragma mark - Public Methods
 
@@ -497,6 +512,10 @@
   [player seekToTime:kCMTimeZero];
   [player setRate:0.0f];
   [playButton setSelected:YES];
+    
+  if ([delegate respondsToSelector:@selector(playerWillStartPlaying)]) {
+      [delegate playerWillStartPlaying];
+  }
   
   if (playAutomatically) {
     [activityIndicator startAnimating];
@@ -527,7 +546,11 @@
 
 - (void)play {
   [player play];
-  
+    
+  if ([delegate respondsToSelector:@selector(playerDidStartPlaying)]) {
+      [delegate playerDidStartPlaying];
+  }
+
   [playButton setSelected:YES];
   
   progressTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f
@@ -548,6 +571,14 @@
 
 - (void)toggleFullscreen {
   [self toggleFullscreen:fullscreenButton];
+}
+
+- (void)hideFullScreenButton {
+    [fullscreenButton setAlpha:0.0f];
+}
+
+- (void)showFullScreenButton {
+    [fullscreenButton setAlpha:1.0f];
 }
 
 - (void)stop {
@@ -595,6 +626,7 @@
 
 
 - (void)airPlayAvailabilityChanged:(NSNotification *)notification {
+    NSLog(@"airPlayAvailabilityChanged");
   [UIView animateWithDuration:0.4f
                    animations:^{
                      if ([volumeView areWirelessRoutesAvailable]) {
@@ -608,6 +640,7 @@
 
 
 - (void)airPlayActivityChanged:(NSNotification *)notification {
+    NSLog(@"airPlayActivityChanged");
   [UIView animateWithDuration:0.4f
                    animations:^{
                      if ([volumeView isWirelessRouteActive]) {

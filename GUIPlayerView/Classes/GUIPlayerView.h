@@ -15,11 +15,14 @@
 @optional
 - (void)playerDidPause;
 - (void)playerDidResume;
+- (void)playerWillStartPlaying;
+- (void)playerDidStartPlaying;
 - (void)playerDidEndPlaying;
 - (void)playerWillEnterFullscreen;
 - (void)playerDidEnterFullscreen;
 - (void)playerWillLeaveFullscreen;
 - (void)playerDidLeaveFullscreen;
+- (void)playerStopped;
 
 - (void)playerFailedToPlayToEnd;
 - (void)playerStalled;
