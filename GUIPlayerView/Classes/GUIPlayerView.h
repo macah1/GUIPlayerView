@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import <AVFoundation/AVFoundation.h>
 
 @class GUIPlayerView;
 
@@ -34,6 +36,7 @@
 @property (strong, nonatomic) NSURL *videoURL;
 @property (assign, nonatomic) NSInteger controllersTimeoutPeriod;
 @property (weak, nonatomic) id<GUIPlayerViewDelegate> delegate;
+@property (strong, nonatomic) AVPlayer *player;
 
 - (void)prepareAndPlayAutomatically:(BOOL)playAutomatically;
 - (void)clean;

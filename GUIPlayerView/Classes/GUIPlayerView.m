@@ -9,14 +9,10 @@
 #import "GUIPlayerView.h"
 #import "GUISlider.h"
 
-#import <AVFoundation/AVFoundation.h>
-#import <MediaPlayer/MediaPlayer.h>
-
 #import "UIView+UpdateAutoLayoutConstraints.h"
 
 @interface GUIPlayerView () <AVAssetResourceLoaderDelegate, NSURLConnectionDataDelegate>
 
-@property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) AVPlayerItem *currentItem;
 
@@ -180,7 +176,7 @@
   [liveLabel setTextColor:[UIColor whiteColor]];
   [liveLabel setText:@"Live"];
   [liveLabel setHidden:YES];
-  
+
   spacerView = [UIView new];
   [spacerView setTranslatesAutoresizingMaskIntoConstraints:NO];
   
